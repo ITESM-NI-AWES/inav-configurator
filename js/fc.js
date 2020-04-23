@@ -22,6 +22,7 @@ var CONFIG,
     LOGIC_CONDITIONS,
     SERIAL_CONFIG,
     SENSOR_DATA,
+    CUSTOM_DATA_DATA,
     MOTOR_DATA,
     SERVO_DATA,
     GPS_DATA,
@@ -201,7 +202,8 @@ var FC = {
             air_speed: 0,
             kinematics: [0.0, 0.0, 0.0],
             temperature: [0, 0, 0, 0, 0, 0, 0, 0],
-            debug: [0, 0, 0, 0]
+            debug: [0, 0, 0, 0],
+            customData: [0, 0, 0, 0] //can hold up to 4 custom values!
         };
 
         MOTOR_DATA = new Array(8);

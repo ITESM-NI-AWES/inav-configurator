@@ -662,6 +662,9 @@ var mspHelper = (function (gui) {
                 for (i = 0; i < 4; i++)
                     SENSOR_DATA.debug[i] = data.getInt16((2 * i), 1);
                 break;
+            case MSPCodes.MSP2_INAV_CUSTOM_DATA_0:
+                    SENSOR_DATA.customData[0] = data.getInt32(0, true); //this gets a single var data, could it send a double?
+                break;
             case MSPCodes.MSP2_INAV_DEBUG:
                 for (i = 0; i < 8; i++)
                     SENSOR_DATA.debug[i] = data.getInt32((4 * i), 1);

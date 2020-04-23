@@ -19,6 +19,7 @@ TABS.sensors.initialize = function (callback) {
             SENSOR_DATA.altitude = 0;
             SENSOR_DATA.temperature[i] = 0;
             SENSOR_DATA.debug[i] = 0;
+            SENSOR_DATA.customData[i] = 0;
         }
     }
 
@@ -197,6 +198,13 @@ TABS.sensors.initialize = function (callback) {
             $('.wrapper.debug').hide();
         }
     }
+    function plot_custom_data(enable) {
+        if (enable) {
+            $('.wrapper.custom.data').show();
+        } else {
+            $('.wrapper.custom.data').hide();
+        }
+    }
 
     GUI.load("./tabs/sensors.html", function load_html() {
         // translate to user-selected language
@@ -248,6 +256,9 @@ TABS.sensors.initialize = function (callback) {
                 case 7:
                     plot_debug(enable);
                     break;
+                case 8:
+                    plot_custom_data(enable);
+                    break;
             }
 
             var checkboxes = [];
@@ -283,6 +294,7 @@ TABS.sensors.initialize = function (callback) {
             samples_airspeed_i = 0,
             samples_temperature_i = 0,
             samples_debug_i = 0,
+            samples_custom_data_0_i = 0,
             gyro_data = initDataArray(3),
             accel_data = initDataArray(3),
             mag_data = initDataArray(3),
@@ -300,6 +312,16 @@ TABS.sensors.initialize = function (callback) {
             initDataArray(1)
         ];
             debug_data = [
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1)
+        ];
+            custom_data_data = [
             initDataArray(1),
             initDataArray(1),
             initDataArray(1),
@@ -336,6 +358,16 @@ TABS.sensors.initialize = function (callback) {
             initGraphHelpers('#debug7', samples_debug_i),
             initGraphHelpers('#debug8', samples_debug_i)
         ];
+        var customDataHelpers = [
+            initGraphHelpers('#customData1', samples_custom_data_0_i),
+            initGraphHelpers('#customData2', samples_custom_data_0_i),
+            initGraphHelpers('#customData3', samples_custom_data_0_i),
+            initGraphHelpers('#customData4', samples_custom_data_0_i),
+            initGraphHelpers('#customData5', samples_custom_data_0_i),
+            initGraphHelpers('#customData6', samples_custom_data_0_i),
+            initGraphHelpers('#customData7', samples_custom_data_0_i),
+            initGraphHelpers('#customData8', samples_custom_data_0_i)
+        ];  //if more custom data are enabled, you should change these values
 
         var raw_data_text_ements = {
             x: [],
@@ -371,7 +403,7 @@ TABS.sensors.initialize = function (callback) {
                 $('.tab-sensors select[name="airspeed_refresh_rate"]').val(result.sensor_settings.rates.airspeed);
 
                 $('.tab-sensors select[name="debug_refresh_rate"]').val(result.sensor_settings.rates.debug);
-
+                $('.tab-sensors select[name="custom_data_refresh_rate"]').val(result.sensor_settings.rates.customData);
                 // start polling data by triggering refresh rate change event
                 $('.tab-sensors .rate select:first').change();
             } else {
@@ -390,7 +422,8 @@ TABS.sensors.initialize = function (callback) {
                 'baro':      parseInt($('.tab-sensors select[name="baro_refresh_rate"]').val(), 10),
                 'sonar':     parseInt($('.tab-sensors select[name="sonar_refresh_rate"]').val(), 10),
                 'airspeed':  parseInt($('.tab-sensors select[name="airspeed_refresh_rate"]').val(), 10),
-                'debug':     parseInt($('.tab-sensors select[name="debug_refresh_rate"]').val(), 10)
+                'debug':     parseInt($('.tab-sensors select[name="debug_refresh_rate"]').val(), 10),
+                'customData':     parseInt($('.tab-sensors select[name="custom_data_refresh_rate"]').val(), 10)
             };
 
             var scales = {
@@ -513,6 +546,21 @@ TABS.sensors.initialize = function (callback) {
                 }, rates.debug, true);
             }
 
+            if (checkboxes[8]) {
+                helper.interval.add('custom_data_pull', function custom_data_data_pull() {
+
+                    /*
+                     * Enable balancer
+                     */
+                    if (helper.mspQueue.shouldDrop()) {
+                        update_custom_data_graph_0();
+                        return;
+                    }
+
+                    MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_DATA_0, false, false, update_custom_data_graph_0);
+                }, rates.customData, true);
+            }
+
             function update_imu_graphs() {
                 if (checkboxes[0]) {
                     updateGraphHelperSize(gyroHelpers);
@@ -589,6 +637,16 @@ TABS.sensors.initialize = function (callback) {
                     raw_data_text_ements.x[6 + 8 + i].text(SENSOR_DATA.debug[i]);
                 }
                 samples_debug_i++;
+            }
+            function update_custom_data_graph_0() {
+                //for (var i = 0; i < 8; i++) { //i should be 4 or 8?
+                    updateGraphHelperSize(customDataHelpers[0]);
+
+                    addSampleToData(custom_data_data[0], samples_custom_data_0_i, [SENSOR_DATA.customData[0]]);
+                    drawGraph(customDataHelpers[0], custom_data_data[0], samples_custom_data_0_i);
+                    raw_data_text_ements.x[6 + 8 + 8 + 0].text(SENSOR_DATA.customData[0]);
+                //}
+                samples_custom_data_0_i++;
             }
         });
 
