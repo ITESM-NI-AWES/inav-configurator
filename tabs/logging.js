@@ -170,6 +170,11 @@ TABS.logging.initialize = function (callback) {
                         head += ',' + 'Debug' + debug;
                     }
                     break;
+                case 'MSP2_INAV_CUSTOM_DATA':
+                    for (var custom = 0; custom < 8; custom++) {
+                        head += ',' + 'Custom' + custom;
+                    }
+                    break;
             }
         }
 
@@ -220,6 +225,9 @@ TABS.logging.initialize = function (callback) {
                 case 'MSP_DEBUG':
                     sample += ',' + SENSOR_DATA.debug;
                     break;
+                case 'MSP2_INAV_CUSTOM_DATA':
+                        sample += ',' + SENSOR_DATA.customData;
+                        break;
             }
         }
 

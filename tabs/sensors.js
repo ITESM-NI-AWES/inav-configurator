@@ -294,7 +294,7 @@ TABS.sensors.initialize = function (callback) {
             samples_airspeed_i = 0,
             samples_temperature_i = 0,
             samples_debug_i = 0,
-            samples_custom_data_0_i = 0,
+            samples_custom_data_i = 0,
             gyro_data = initDataArray(3),
             accel_data = initDataArray(3),
             mag_data = initDataArray(3),
@@ -359,15 +359,15 @@ TABS.sensors.initialize = function (callback) {
             initGraphHelpers('#debug8', samples_debug_i)
         ];
         var customDataHelpers = [
-            initGraphHelpers('#customData1', samples_custom_data_0_i),
-            initGraphHelpers('#customData2', samples_custom_data_0_i),
-            initGraphHelpers('#customData3', samples_custom_data_0_i),
-            initGraphHelpers('#customData4', samples_custom_data_0_i),
-            initGraphHelpers('#customData5', samples_custom_data_0_i),
-            initGraphHelpers('#customData6', samples_custom_data_0_i),
-            initGraphHelpers('#customData7', samples_custom_data_0_i),
-            initGraphHelpers('#customData8', samples_custom_data_0_i)
-        ];  //if more custom data are enabled, you should change these values
+            initGraphHelpers('#customData1', samples_custom_data_i),
+            initGraphHelpers('#customData2', samples_custom_data_i),
+            initGraphHelpers('#customData3', samples_custom_data_i),
+            initGraphHelpers('#customData4', samples_custom_data_i),
+            initGraphHelpers('#customData5', samples_custom_data_i),
+            initGraphHelpers('#customData6', samples_custom_data_i),
+            initGraphHelpers('#customData7', samples_custom_data_i),
+            initGraphHelpers('#customData8', samples_custom_data_i)
+        ];  
 
         var raw_data_text_ements = {
             x: [],
@@ -553,11 +553,11 @@ TABS.sensors.initialize = function (callback) {
                      * Enable balancer
                      */
                     if (helper.mspQueue.shouldDrop()) {
-                        update_custom_data_graph_0();
+                        update_custom_data_graph();
                         return;
                     }
 
-                    MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_DATA_0, false, false, update_custom_data_graph_0);
+                    MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_DATA, false, false, update_custom_data_graph);
                 }, rates.customData, true);
             }
 
@@ -638,15 +638,14 @@ TABS.sensors.initialize = function (callback) {
                 }
                 samples_debug_i++;
             }
-            function update_custom_data_graph_0() {
-                //for (var i = 0; i < 8; i++) { //i should be 4 or 8?
-                    updateGraphHelperSize(customDataHelpers[0]);
-
-                    addSampleToData(custom_data_data[0], samples_custom_data_0_i, [SENSOR_DATA.customData[0]]);
-                    drawGraph(customDataHelpers[0], custom_data_data[0], samples_custom_data_0_i);
-                    raw_data_text_ements.x[6 + 8 + 8 + 0].text(SENSOR_DATA.customData[0]);
-                //}
-                samples_custom_data_0_i++;
+            function update_custom_data_graph() {
+                for (var i = 0; i < 8; i++) { 
+                    updateGraphHelperSize(customDataHelpers[i]);
+                    addSampleToData(custom_data_data[i], samples_custom_data_i, [SENSOR_DATA.customData[i]]);
+                    drawGraph(customDataHelpers[i], custom_data_data[i], samples_custom_data_i);
+                    raw_data_text_ements.x[6 + 8 + 8 + i].text(SENSOR_DATA.customData[i]);
+                }
+                samples_custom_data_i++;
             }
         });
 
